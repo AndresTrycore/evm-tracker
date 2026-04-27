@@ -4,6 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_env: str = "development"
+    api_root_path: str = ""
+    backend_cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
     database_url: str | None = None
     db_host: str = "localhost"
     db_port: int = 5432
