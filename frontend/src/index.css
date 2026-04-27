@@ -3,26 +3,27 @@
 @tailwind utilities;
 
 :root {
-  /* Colors Base - Dark (Default) */
-  --bg-base: #0E0F11;
-  --bg-surface: #16181C;
-  --bg-elevated: #1E2126;
-  --border: #2A2D33;
-  --border-subtle: #1E2126;
-  --text-primary: #E8E6E1;
-  --text-secondary: #8A8784;
-  --text-disabled: #4A4846;
-  --accent: #4F7CFF;
-  --accent-subtle: #1A2540;
-  --glass-bg: rgba(22, 24, 28, 0.7);
-  --glass-border: rgba(42, 45, 51, 0.5);
+  /* Colors Base - Future Dark Balanced */
+  --bg-base: #0D0E12; /* Negro azulado profundo con más visibilidad */
+  --bg-surface: #16181D; /* Tono intermedio para Sidebar y Cards */
+  --bg-elevated: #22252E;
+  --border: rgba(139, 92, 246, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.03);
+  --text-primary: #FFFFFF;
+  --text-secondary: #94A3B8;
+  --text-disabled: #475569;
+  --accent: #8B5CF6;
+  /* Electric Violet */
+  --accent-subtle: rgba(139, 92, 246, 0.1);
+  --glass-bg: rgba(12, 13, 18, 0.7);
+  --glass-border: rgba(139, 92, 246, 0.2);
 
-  /* Health EVM */
-  --health-green: #4ADE80;
-  --health-yellow: #FACC15;
-  --health-orange: #FB923C;
-  --health-red: #F87171;
-  --health-gray: #8A8784;
+  /* Health EVM - Vibrantes */
+  --health-green: #22C55E;
+  --health-yellow: #EAB308;
+  --health-orange: #F97316;
+  --health-red: #EF4444;
+  --health-gray: #64748B;
 }
 
 [data-theme="light"],
