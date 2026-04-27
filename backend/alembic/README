@@ -1,0 +1,97 @@
+# Alembic Guide (EVM Tracker)
+
+Esta carpeta contiene la configuración de migraciones de base de datos.
+
+## Objetivo
+
+Usar migraciones versionadas para mantener el esquema PostgreSQL consistente entre desarrolladores y entornos.
+
+## Archivos clave
+
+- [alembic.ini](../alembic.ini): configuracion principal de Alembic
+- [env.py](env.py): integra Alembic con settings del proyecto
+- [versions](versions): historial de revisiones
+
+## Importante antes de ejecutar comandos
+
+- Ejecuta los comandos desde la raiz del repositorio.
+- Asegurate de tener configurado [.env.development](../../.env.development).
+- Asegurate de que PostgreSQL este arriba en Docker.
+
+## Flujo recomendado
+
+1. Levantar DB:
+
+```bash
+docker compose up -d db
+```
+
+2. Revisar revision actual:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini current
+```
+
+3. Aplicar migraciones pendientes:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini upgrade head
+```
+
+## Crear una nueva migracion
+
+Si cambias modelos SQLAlchemy:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini revision --autogenerate -m "describe_cambio"
+```
+
+Si necesitas una revision manual:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini revision -m "describe_cambio"
+```
+
+## Comandos utiles
+
+Ver historial:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini history
+```
+
+Bajar una revision:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini downgrade -1
+```
+
+Ir a una revision especifica:
+
+```bash
+docker compose run --rm api alembic -c backend/alembic.ini downgrade <revision_id>
+docker compose run --rm api alembic -c backend/alembic.ini upgrade <revision_id>
+```
+
+## Buenas practicas
+
+- No editar migraciones ya aplicadas en otros entornos.
+- Una migracion por cambio de esquema, con mensaje claro.
+- Revisar el archivo autogenerado antes de aplicarlo.
+- Confirmar que upgrade y downgrade sean coherentes.
+
+## Troubleshooting rapido
+
+Error de conexion:
+
+- Verifica [.env](../../.env).
+- Verifica que el servicio db este healthy:
+
+```bash
+docker compose ps
+```
+
+Si Alembic no detecta cambios:
+
+- Confirma que el modelo este importado en [app/models/__init__.py](../app/models/__init__.py).
+- Revisa target_metadata en [env.py](env.py).
