@@ -4,16 +4,14 @@ services:
   db:
     image: postgres:15-alpine
     container_name: evm_db
-    environment:
-      POSTGRES_USER: evm_user
-      POSTGRES_PASSWORD: evm_password
-      POSTGRES_DB: evm_db
+    env_file:
+      - .env
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U evm_user -d evm_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,9 +21,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: evm_api
-    environment:
-      - APP_ENV=development
-      - DATABASE_URL=postgresql://evm_user:evm_password@db:5432/evm_db
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     volumes:
