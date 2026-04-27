@@ -5,6 +5,7 @@ import { SkeletonPulse } from './ui/Skeleton';
 import { EmptyState } from './ui/EmptyState';
 import { LayoutDashboard, AlertCircle, Plus } from 'lucide-react';
 import { EVMVisualizations } from './EVMVisualizations';
+import { ProjectKPIs } from './ProjectKPIs';
 import { ActivityTable } from './ActivityTable';
 import { ActivityForm } from './ActivityForm';
 import { useDeleteActivity } from '../hooks/useDeleteActivity';
@@ -77,25 +78,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ projectId, onNewActivity }
   return (
     <div className="flex-1 p-4 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
       {/* Sección KPIs (Skeletons o Real) */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <SkeletonPulse key={i} className="h-32 w-full" />
-          ))
-        ) : (
-          <>
-            {/* Placeholder para ProjectKPIs */}
-            <div className="h-32 bg-background-elevated rounded-xl border border-border-subtle p-6 flex flex-col justify-between shadow-sm">
-              <span className="text-label text-text-secondary uppercase">CPI</span>
-              <span className="text-3xl font-bold text-health-green">{project?.evm_summary.cost_performance_index?.toFixed(2) || '0.00'}</span>
-            </div>
-            <div className="h-32 bg-background-elevated rounded-xl border border-border-subtle p-6 flex flex-col justify-between shadow-sm">
-              <span className="text-label text-text-secondary uppercase">SPI</span>
-              <span className="text-3xl font-bold text-accent">{project?.evm_summary.schedule_performance_index?.toFixed(2) || '0.00'}</span>
-            </div>
-            {/* ... más placeholders ... */}
-          </>
-        )}
+      <section>
+        <ProjectKPIs evm={project?.evm_summary} isLoading={isLoading} />
       </section>
 
       {/* Sección Gráficas (Visualizaciones EVM Reales) */}
