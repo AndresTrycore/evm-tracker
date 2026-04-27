@@ -1,4 +1,4 @@
-from backend.app.services.evm_service import (
+from app.services.evm_service import (
     ActivitySummary,
     calculate_activity_evm,
     calculate_project_evm,
@@ -55,7 +55,7 @@ def test_activity_zero_division_pv() -> None:
 
 def test_project_no_activities() -> None:
     res = calculate_project_evm([])
-    assert res.total_bac == 0.0
+    assert res.bac == 0.0
     assert res.cpi == 0.0
     assert res.cost_status == "sin datos"
 
@@ -73,10 +73,10 @@ def test_project_with_activities() -> None:
 
     res = calculate_project_evm([act1, act2])
 
-    assert res.total_bac == 3000.0
-    assert res.total_pv == 2500.0
-    assert res.total_ev == 1500.0
-    assert res.total_ac == 1400.0
+    assert res.bac == 3000.0
+    assert res.pv == 2500.0
+    assert res.ev == 1500.0
+    assert res.ac == 1400.0
     assert res.cv == 100.0
     assert res.sv == -1000.0
     assert res.cpi == round(1500 / 1400, 4)
@@ -102,3 +102,4 @@ def test_activity_adelantado() -> None:
     # PV = 2000, EV = 5000 -> SPI = 2.5
     assert res.spi == 2.5
     assert res.schedule_status == "adelantado"
+

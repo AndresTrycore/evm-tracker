@@ -19,10 +19,10 @@ class EVMActivityIndicators:
 
 @dataclass
 class EVMProjectIndicators:
-    total_bac: float
-    total_pv: float
-    total_ev: float
-    total_ac: float
+    bac: float
+    pv: float
+    ev: float
+    ac: float
     cv: float
     sv: float
     cpi: float | None
@@ -31,6 +31,7 @@ class EVMProjectIndicators:
     vac: float | None
     cost_status: str
     schedule_status: str
+
 
 
 def safe_divide(numerator: float, denominator: float) -> float | None:
@@ -114,10 +115,10 @@ class ActivitySummary:
 def calculate_project_evm(activities: list[ActivitySummary]) -> EVMProjectIndicators:
     if not activities:
         return EVMProjectIndicators(
-            total_bac=0.0,
-            total_pv=0.0,
-            total_ev=0.0,
-            total_ac=0.0,
+            bac=0.0,
+            pv=0.0,
+            ev=0.0,
+            ac=0.0,
             cv=0.0,
             sv=0.0,
             cpi=0.0,
@@ -127,6 +128,7 @@ def calculate_project_evm(activities: list[ActivitySummary]) -> EVMProjectIndica
             cost_status="sin datos",
             schedule_status="sin datos",
         )
+
 
     total_bac = sum(a.budget_at_completion for a in activities)
     total_pv = sum(a.planned_value for a in activities)
@@ -143,10 +145,10 @@ def calculate_project_evm(activities: list[ActivitySummary]) -> EVMProjectIndica
     vac = (total_bac - eac) if eac is not None else None
 
     return EVMProjectIndicators(
-        total_bac=round(total_bac, 4),
-        total_pv=round(total_pv, 4),
-        total_ev=round(total_ev, 4),
-        total_ac=round(total_ac, 4),
+        bac=round(total_bac, 4),
+        pv=round(total_pv, 4),
+        ev=round(total_ev, 4),
+        ac=round(total_ac, 4),
         cv=round(cv, 4),
         sv=round(sv, 4),
         cpi=round(cpi, 4) if cpi is not None else None,
@@ -156,3 +158,4 @@ def calculate_project_evm(activities: list[ActivitySummary]) -> EVMProjectIndica
         cost_status=_get_cost_status(cpi),
         schedule_status=_get_schedule_status(spi),
     )
+

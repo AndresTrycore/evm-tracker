@@ -2,14 +2,13 @@ import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
+from app.db.base import Base
 from sqlalchemy import CheckConstraint, DateTime, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.db.base import Base
-
 if TYPE_CHECKING:
-    from backend.app.models.activity import Activity
+    from app.models.activity import Activity
 
 
 def _utcnow() -> datetime:

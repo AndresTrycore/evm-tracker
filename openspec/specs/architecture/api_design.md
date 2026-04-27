@@ -4,6 +4,7 @@
 
 - Estilo: REST con recursos anidados para actividades bajo proyectos.
 - Prefijo global: `/api/v1`
+- Endpoint de salud: `/health`
 - Formato de request y response: `application/json` en todos los endpoints.
 - Fechas: ISO 8601 con zona horaria UTC — `"2024-01-15T10:30:00Z"`.
 - Números decimales: máximo 2 decimales en la respuesta (redondear con `round(value, 2)`).
@@ -11,6 +12,16 @@
 - Documentación interactiva disponible en `/docs` (Swagger UI) y `/redoc` (ReDoc).
 - Cada endpoint debe incluir en su decorador: `summary`, `description`, `response_model`
   y `responses` con todos los códigos de error posibles.
+
+### Composición real de rutas
+
+La API compone rutas por prefijos en `APIRouter`:
+
+- Router raíz (`main.py`): prefijo `/api/v1`
+- Router de proyectos (`api/v1/router.py`): prefijo `/projects`
+- Router de actividades (`api/v1/router.py`): prefijo `/projects/{project_id}/activities`
+
+Por ello, los handlers en `projects.py` y `activities.py` usan rutas relativas como `/` y `/{activity_id}`.
 
 ---
 
@@ -533,24 +544,26 @@ Un **SPI > 1** indica adelanto en cronograma.
     """,
     version="1.0.0",
     contact={
-        "name": "EVM Tracker",
-    },
-    openapi_tags=[
-        {
-            "name": "projects",
-            "description": "Gestión de proyectos y consulta de indicadores EVM consolidados.",
-        },
-        {
-            "name": "activities",
-            "description": "Gestión de actividades con indicadores EVM calculados en tiempo real.",
-        },
-    ]
+      "name": "EVM Tracker",
+    }
 )
+
+  app.include_router(api_router, prefix="/api/v1")
+
+
+  @app.get("/health", tags=["health"])
+  def health_check() -> dict[str, str]:
+    return {"status": "ok"}
 ```
 
-Cada endpoint debe declarar su tag correspondiente:
+  Las etiquetas se asignan en la composición de routers:
 ```python
-@router.get("/projects", tags=["projects"], summary="...", description="...")
+  api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
+  api_router.include_router(
+    activities.router,
+    prefix="/projects/{project_id}/activities",
+    tags=["activities"],
+  )
 ```
 
 ---
