@@ -138,14 +138,14 @@ export const ActivityTable: React.FC<ActivityTableProps> = ({
   return (
     <div className="space-y-4">
       {/* Buscador */}
-      <div className="relative">
-        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled" />
+      <div className="relative group">
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-disabled group-focus-within:text-accent transition-colors" />
         <input 
           type="search"
           placeholder="Buscar actividad..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-background-elevated border border-border rounded-md pl-10 pr-4 py-2 text-body focus:outline-none focus:border-accent"
+          className="w-full bg-background-elevated border border-border-subtle rounded-2xl pl-12 pr-4 py-2.5 text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all appearance-none"
         />
       </div>
 

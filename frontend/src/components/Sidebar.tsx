@@ -46,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Contenedor del Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-72 bg-background-base border-r border-border-subtle 
+        fixed inset-y-0 left-0 z-50 w-72 bg-background-surface border-r border-white/5 
         flex flex-col transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0 md:static
@@ -74,28 +74,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="relative group">
             <Search 
               size={16} 
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-disabled group-focus-within:text-accent transition-colors" 
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-text-disabled group-focus-within:text-accent transition-colors" 
             />
             <input
               type="text"
               placeholder="Buscar proyecto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-background-elevated border border-border-subtle rounded-lg pl-10 pr-4 py-2 text-body focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+              className="w-full bg-background-elevated border border-border-subtle rounded-2xl pl-12 pr-4 py-2.5 text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all appearance-none"
             />
           </div>
         </div>
 
         {/* Lista de Proyectos */}
         <div className="flex-1 overflow-y-auto px-4 custom-scrollbar">
-          <div className="mb-2 text-label text-text-secondary uppercase tracking-widest px-2">
+          <div className="mb-4 text-label text-text-secondary uppercase tracking-[0.2em] px-3 font-semibold opacity-60">
             Proyectos
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <SkeletonPulse key={i} className="h-10 w-full" />
+                <SkeletonPulse key={i} className="h-12 w-full rounded-2xl" />
               ))
             ) : filteredProjects.length === 0 ? (
               <div className="px-3 py-8 text-center text-caption text-text-disabled italic">
@@ -110,14 +110,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     if (window.innerWidth < 768) onClose();
                   }}
                   className={`
-                    group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all
+                    group flex items-center justify-between px-4 py-3 rounded-2xl cursor-pointer transition-all duration-200
                     ${selectedId === project.id 
-                      ? 'bg-accent-subtle text-accent font-medium' 
-                      : 'text-text-secondary hover:bg-background-elevated hover:text-text-primary'}
+                      ? 'bg-accent/10 text-accent font-semibold shadow-[0_0_15px_rgba(139,92,246,0.1)]' 
+                      : 'text-text-secondary hover:bg-background-elevated/80 hover:text-text-primary'}
                   `}
                 >
                   <div className="flex items-center gap-3 truncate">
-                    <Folder size={18} className={selectedId === project.id ? 'text-accent' : 'text-text-disabled group-hover:text-text-secondary'} />
+                    <div className={`p-1.5 rounded-lg ${selectedId === project.id ? 'bg-accent/20' : 'bg-background-elevated'}`}>
+                      <Folder size={16} className={selectedId === project.id ? 'text-accent' : 'text-text-disabled group-hover:text-text-secondary'} />
+                    </div>
                     <span className="truncate">{project.name}</span>
                   </div>
                   
@@ -126,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       e.stopPropagation();
                       onDelete(project.id);
                     }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:text-health-red transition-all"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 hover:text-health-red hover:bg-health-red/10 rounded-lg transition-all"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -137,12 +139,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Acción: Nuevo Proyecto */}
-        <div className="p-4 border-t border-border-subtle">
+        <div className="p-6 border-t border-border-subtle bg-background-base/50 backdrop-blur-sm">
           <button
             onClick={onNew}
-            className="w-full flex items-center justify-center gap-2 bg-accent text-white py-2.5 rounded-lg font-medium hover:bg-accent-hover active:scale-95 transition-all shadow-lg shadow-accent/20"
+            className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3.5 rounded-2xl font-bold hover:bg-accent-hover active:scale-95 transition-all shadow-xl shadow-accent/20"
           >
-            <Plus size={18} />
+            <Plus size={18} strokeWidth={3} />
             <span>Nuevo Proyecto</span>
           </button>
         </div>

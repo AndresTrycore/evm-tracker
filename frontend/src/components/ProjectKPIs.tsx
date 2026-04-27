@@ -144,7 +144,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoa
       {/* Widgets Core */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* CPI Widget */}
-        <div className="relative overflow-hidden bg-background-surface border border-border rounded-xl p-6 shadow-sm flex flex-col justify-between h-[130px] group">
+        <div className="relative overflow-hidden card-elevated flex flex-col justify-between h-[130px] group !p-6 rounded-[2rem]">
           <div className="z-10 flex flex-col">
             <span className="text-label text-text-secondary uppercase tracking-wider mb-1">
               Desempeño de Costo (CPI)
@@ -155,10 +155,16 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoa
           </div>
           {/* Sparkline de fondo */}
           {cpiData.length > 0 && (
-            <div className="absolute bottom-0 left-0 w-full h-16 opacity-30 group-hover:opacity-50 transition-opacity">
+            <div className="absolute bottom-0 left-0 w-full h-16 opacity-40 group-hover:opacity-70 transition-opacity">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={cpiData}>
-                  <Area type="monotone" dataKey="value" stroke={cpiTrendColor} fill={cpiTrendColor} strokeWidth={2} />
+                  <defs>
+                    <linearGradient id="gradientCpi" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="var(--accent)" fill="url(#gradientCpi)" strokeWidth={3} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -166,7 +172,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoa
         </div>
 
         {/* SPI Widget */}
-        <div className="relative overflow-hidden bg-background-surface border border-border rounded-xl p-6 shadow-sm flex flex-col justify-between h-[130px] group">
+        <div className="relative overflow-hidden card-elevated flex flex-col justify-between h-[130px] group !p-6 rounded-[2rem]">
           <div className="z-10 flex flex-col">
             <span className="text-label text-text-secondary uppercase tracking-wider mb-1">
               Desempeño de Plazo (SPI)
@@ -177,10 +183,16 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoa
           </div>
           {/* Sparkline de fondo */}
           {spiData.length > 0 && (
-            <div className="absolute bottom-0 left-0 w-full h-16 opacity-30 group-hover:opacity-50 transition-opacity">
+            <div className="absolute bottom-0 left-0 w-full h-16 opacity-40 group-hover:opacity-70 transition-opacity">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={spiData}>
-                  <Area type="monotone" dataKey="value" stroke={spiTrendColor} fill={spiTrendColor} strokeWidth={2} />
+                  <defs>
+                    <linearGradient id="gradientSpi" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#A855F7" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#A855F7" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="value" stroke="#A855F7" fill="url(#gradientSpi)" strokeWidth={3} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -188,7 +200,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoa
         </div>
 
         {/* EAC Widget */}
-        <div className="bg-background-surface border border-border rounded-xl p-6 shadow-sm flex flex-col justify-between h-[130px]">
+        <div className="card-elevated flex flex-col justify-between h-[130px] !p-6 rounded-[2rem]">
           <span className="text-label text-text-secondary uppercase tracking-wider mb-1">
             Estimación al Finalizar (EAC)
           </span>
@@ -208,8 +220,8 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoa
           <span>{isDetailOpen ? 'Ocultar diagnóstico' : 'Ver diagnóstico detallado'}</span>
         </button>
 
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isDetailOpen ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="bg-glass-bg backdrop-blur-md border border-glass-border shadow-xl rounded-xl p-5 md:p-6">
+        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isDetailOpen ? 'max-h-[500px] mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+          <div className="glass-panel p-5 md:p-6 !rounded-[2rem] border-accent/20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-1">
               {/* Columna Izquierda */}
               <div className="space-y-1 md:border-r border-border-subtle md:pr-8">

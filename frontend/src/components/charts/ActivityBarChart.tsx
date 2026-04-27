@@ -28,12 +28,12 @@ export const ActivityBarChart: React.FC<ActivityBarChartProps> = ({ activities, 
   
   // Colores consistentes con el sistema de diseño (hex para compatibilidad con SVG)
   const colors = {
-    accent: '#4F7CFF',
-    accentSecondary: '#8B5CF6',
-    red: '#F87171',
-    orange: '#FB923C',
-    text: '#8A8784',
-    grid: '#1E2126',
+    accent: '#8B5CF6', // Electric Violet
+    accentSecondary: '#D8B4FE', // Light Violet
+    red: '#EF4444',
+    orange: '#F97316',
+    text: '#94A3B8',
+    grid: '#15171F',
   };
 
   const chartData = useMemo(() => {

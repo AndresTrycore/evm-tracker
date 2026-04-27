@@ -18,7 +18,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({
   className = '' 
 }) => {
   return (
-    <div className={`bg-background-surface border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col ${className}`}>
+    <div className={`card-elevated flex flex-col ${className}`}>
       <div className="mb-6">
         <h3 className="text-heading font-semibold text-text-primary tracking-tight">
           {title}
