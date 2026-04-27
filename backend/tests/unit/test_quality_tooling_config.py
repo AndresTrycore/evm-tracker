@@ -30,9 +30,9 @@ def test_backend_dockerfile_installs_tooling_from_pyproject() -> None:
 
 
 def test_readme_documents_backend_quality_commands() -> None:
-    readme_text = (
-        Path(__file__).resolve().parents[3] / "README.md"
-    ).read_text(encoding="utf-8")
+    readme_text = (Path(__file__).resolve().parents[3] / "README.md").read_text(
+        encoding="utf-8"
+    )
 
     assert "ruff check app tests" in readme_text
     assert "mypy app" in readme_text
