@@ -1,14 +1,13 @@
 import React, { useMemo } from 'react';
-import { Project, Activity } from '../types';
+import { ProjectWithEVM } from '../types';
 import { ChartCard } from './charts/ChartCard';
 import { SCurveChart } from './charts/SCurveChart';
 import { HealthRadarChart } from './charts/HealthRadarChart';
 import { BACDonutChart } from './charts/BACDonutChart';
-
 import { ActivityBarChart } from './charts/ActivityBarChart';
 
 interface EVMVisualizationsProps {
-  project: Project;
+  project: ProjectWithEVM;
   isLoading?: boolean;
 }
 
@@ -26,9 +25,9 @@ export const EVMVisualizations: React.FC<EVMVisualizationsProps> = ({ project, i
     const grouped = project.activities.reduce((acc, act) => {
       const date = act.end_date || 'Sin fecha';
       if (!acc[date]) acc[date] = { pv: 0, ev: 0, ac: 0 };
-      acc[date].pv += act.planned_value;
-      acc[date].ev += act.earned_value;
-      acc[date].ac += act.actual_cost;
+      acc[date].pv += act.evm.planned_value ?? 0;
+      acc[date].ev += act.evm.earned_value ?? 0;
+      acc[date].ac += act.actual_cost ?? 0;
       return acc;
     }, {} as Record<string, { pv: number; ev: number; ac: number }>);
 
@@ -86,8 +85,8 @@ export const EVMVisualizations: React.FC<EVMVisualizationsProps> = ({ project, i
         className="lg:col-span-1"
       >
         <HealthRadarChart 
-          cpi={project.evm_summary.cost_performance_index}
-          spi={project.evm_summary.schedule_performance_index}
+          cpi={project.evm_summary.cost_performance_index ?? 0}
+          spi={project.evm_summary.schedule_performance_index ?? 0}
           cv={project.evm_summary.cost_variance}
           sv={project.evm_summary.schedule_variance}
           bac={totalBac}

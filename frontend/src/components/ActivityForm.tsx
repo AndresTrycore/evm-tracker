@@ -117,7 +117,10 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     e.preventDefault();
     
     // Marcar todos como tocados
-    const allTouched = Object.keys(fields).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+    const allTouched = Object.keys(fields).reduce<Partial<Record<keyof FormFields, boolean>>>(
+      (acc, key) => ({ ...acc, [key]: true }),
+      {}
+    );
     setTouched(allTouched);
 
     if (!isFormValid) return;
@@ -132,7 +135,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
     if (isEditing) {
       updateMutation.mutate(
-        { activityId: activity.id, data: payload },
+        { activityId: activity!.id, data: payload },
         { onSuccess: () => onClose() }
       );
     } else {

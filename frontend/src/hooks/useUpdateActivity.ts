@@ -10,11 +10,11 @@ import { ActivityUpdate } from '../types';
  * @param projectId ID del proyecto.
  * @param activityId ID de la actividad a actualizar.
  */
-export const useUpdateActivity = (projectId: string, activityId: string) => {
+export const useUpdateActivity = (projectId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: ActivityUpdate) => 
+    mutationFn: ({ activityId, data }: { activityId: string; data: ActivityUpdate }) => 
       activityService.updateActivity(projectId, activityId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
