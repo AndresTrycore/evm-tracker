@@ -1,8 +1,10 @@
 import React from 'react';
 import { ThemeToggle } from './components/ThemeToggle';
-import { LayoutDashboard, Folder, Settings, Plus } from 'lucide-react';
+import { LayoutDashboard, Folder, Settings, Plus, Loader2 } from 'lucide-react';
+import { useProjects } from './hooks/useProjects';
 
 function App() {
+  const { data: projects, isLoading, isError, error } = useProjects();
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-background-base text-text-primary font-sans transition-colors duration-300">
       {/* Mini Sidebar Placeholder */}
@@ -14,15 +16,37 @@ function App() {
           <h1 className="text-heading font-bold">EVM Tracker</h1>
         </div>
         
-        <nav className="flex-1 flex flex-col gap-2">
+        <nav className="flex-1 flex flex-col gap-2 overflow-y-auto">
           <div className="flex items-center gap-3 px-3 py-2 bg-accent-subtle text-accent rounded-md">
             <LayoutDashboard size={18} />
             <span className="text-body font-medium">Dashboard</span>
           </div>
-          <div className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-background-elevated rounded-md transition-colors cursor-pointer">
-            <Folder size={18} />
-            <span className="text-body">Proyectos</span>
+          
+          <div className="mt-4 mb-2 px-3 text-label text-text-secondary uppercase tracking-wider">
+            Proyectos
           </div>
+
+          {isLoading ? (
+            <div className="flex items-center gap-2 px-3 py-2 text-text-secondary">
+              <Loader2 size={16} className="animate-spin" />
+              <span className="text-caption">Cargando...</span>
+            </div>
+          ) : isError ? (
+            <div className="px-3 py-2 text-health-red text-caption">
+              Error al cargar proyectos
+            </div>
+          ) : projects?.length === 0 ? (
+            <div className="px-3 py-2 text-text-disabled text-caption italic">
+              Sin proyectos
+            </div>
+          ) : (
+            projects?.map((project) => (
+              <div key={project.id} className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-background-elevated rounded-md transition-colors cursor-pointer group">
+                <Folder size={18} className="group-hover:text-accent transition-colors" />
+                <span className="text-body truncate">{project.name}</span>
+              </div>
+            ))
+          )}
         </nav>
 
         <div className="pt-4 border-t border-border-subtle flex items-center justify-between">
