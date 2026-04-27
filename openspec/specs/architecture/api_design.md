@@ -4,7 +4,9 @@
 
 - Estilo: REST con recursos anidados para actividades bajo proyectos.
 - Prefijo global: `/api/v1`
-- Endpoint de salud: `/health`
+- Endpoint de salud: `/health` (Valida API y conexión a base de datos).
+- Seguridad: CORS habilitado para orígenes específicos de desarrollo.
+- Soporte Proxy: Root Path configurable.
 - Formato de request y response: `application/json` en todos los endpoints.
 - Fechas: ISO 8601 con zona horaria UTC — `"2024-01-15T10:30:00Z"`.
 - Números decimales: máximo 2 decimales en la respuesta (redondear con `round(value, 2)`).
@@ -551,10 +553,29 @@ Un **SPI > 1** indica adelanto en cronograma.
   app.include_router(api_router, prefix="/api/v1")
 
 
-  @app.get("/health", tags=["health"])
-  def health_check() -> dict[str, str]:
-    return {"status": "ok"}
+@app.get("/health", tags=["health"])
+def health_check(db: Session = Depends(get_db)) -> dict[str, str]:
+    """
+    Valida la salud del API y la conexión a la base de datos.
+    """
+    try:
+        db.execute(text("SELECT 1"))
+        return {"status": "ok", "db": "connected"}
+    except Exception:
+        return {"status": "error", "db": "disconnected"}
 ```
+
+## Seguridad y Middleware
+
+### CORS (Cross-Origin Resource Sharing)
+El API implementa `CORSMiddleware` para permitir la comunicación con el frontend.
+
+- **Orígenes permitidos**: `http://localhost:3000`, `http://localhost:5173`
+- **Métodos**: `GET, POST, PUT, DELETE, OPTIONS`
+- **Headers**: `Content-Type, Authorization`
+
+### Root Path
+Soporte para `root_path` inyectado desde la configuración para despliegues detrás de proxies invertidos.
 
   Las etiquetas se asignan en la composición de routers:
 ```python
