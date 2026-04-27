@@ -19,6 +19,11 @@ export const Header: React.FC<HeaderProps> = ({
   onSimulate,
   onExport,
 }) => {
+  const simulateTooltip =
+    'Próximamente: ejecutará escenarios EVM (optimista, base y pesimista) para estimar impacto en CPI, SPI y EAC.';
+  const reportTooltip =
+    'Próximamente: generará y descargará un reporte ejecutivo del proyecto con KPIs, curvas y diagnóstico EVM.';
+
   return (
     <header className="sticky top-0 z-30 w-full h-16 bg-background-base/80 backdrop-blur-md border-b border-border-subtle flex items-center justify-between px-4 md:px-8">
       <div className="flex items-center gap-4">
@@ -39,6 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="hidden sm:flex items-center gap-2 mr-2 border-r border-border-subtle pr-4">
           <button 
             onClick={onSimulate}
+            title={simulateTooltip}
+            aria-label={simulateTooltip}
             className="flex items-center gap-2 px-3 py-1.5 text-caption font-medium text-accent hover:bg-accent-subtle rounded-md transition-colors"
           >
             <Play size={14} />
@@ -46,6 +53,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button 
             onClick={onExport}
+            title={reportTooltip}
+            aria-label={reportTooltip}
             className="flex items-center gap-2 px-3 py-1.5 text-caption font-medium text-text-secondary hover:bg-background-elevated rounded-md transition-colors"
           >
             <Download size={14} />

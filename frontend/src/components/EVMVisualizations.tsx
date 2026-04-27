@@ -5,6 +5,8 @@ import { SCurveChart } from './charts/SCurveChart';
 import { HealthRadarChart } from './charts/HealthRadarChart';
 import { BACDonutChart } from './charts/BACDonutChart';
 
+import { ActivityBarChart } from './charts/ActivityBarChart';
+
 interface EVMVisualizationsProps {
   project: Project;
   isLoading?: boolean;
@@ -59,6 +61,13 @@ export const EVMVisualizations: React.FC<EVMVisualizationsProps> = ({ project, i
       .slice(0, 8);
   }, [project.activities]);
 
+  const totalBac = useMemo(() => {
+    return project.activities.reduce(
+      (acc, activity) => acc + Math.max(activity.budget_at_completion, 0),
+      0,
+    );
+  }, [project.activities]);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Curva S - Ocupa 2 columnas */}
@@ -81,11 +90,11 @@ export const EVMVisualizations: React.FC<EVMVisualizationsProps> = ({ project, i
           spi={project.evm_summary.schedule_performance_index}
           cv={project.evm_summary.cost_variance}
           sv={project.evm_summary.schedule_variance}
-          bac={project.evm_summary.budget_at_completion}
+          bac={totalBac}
         />
       </ChartCard>
 
-      {/* Donut de BAC - Ocupa 1 columna (podemos expandir el grid en el futuro) */}
+      {/* Donut de BAC - Ocupa 1 columna */}
       <ChartCard 
         title="Distribución Presupuestaria" 
         subtitle="BAC total distribuido por actividades principales"
@@ -93,20 +102,22 @@ export const EVMVisualizations: React.FC<EVMVisualizationsProps> = ({ project, i
       >
         <BACDonutChart 
           data={donutData} 
-          totalBac={project.evm_summary.budget_at_completion} 
+          totalBac={totalBac} 
         />
       </ChartCard>
 
-      {/* Placeholder para futuras gráficas (ej: Desempeño por Actividad) */}
+      {/* Rendimiento por Actividad - Ocupa 2 columnas */}
       <ChartCard 
         title="Rendimiento por Actividad" 
-        subtitle="Comparativa de eficiencia CPI/SPI individual"
+        subtitle="Comparativa de eficiencia CPI/SPI individual (Peores 10)"
         className="lg:col-span-2"
       >
-        <div className="w-full h-full flex items-center justify-center text-text-disabled italic text-caption">
-          Gráfica de barras de rendimiento en desarrollo...
-        </div>
+        <ActivityBarChart 
+          activities={project.activities} 
+          isLoading={isLoading} 
+        />
       </ChartCard>
     </div>
   );
 };
+

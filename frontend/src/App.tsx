@@ -3,6 +3,9 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { useProjects } from './hooks/useProjects';
+import { useCreateProject } from './hooks/useCreateProject';
+import { useDeleteProject } from './hooks/useDeleteProject';
+import { ProjectModal } from './components/ProjectModal';
 
 const STORAGE_KEY = 'evm-selected-project';
 
@@ -12,9 +15,11 @@ function App() {
     return localStorage.getItem(STORAGE_KEY);
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   // --- Datos ---
   const { data: projects = [], isLoading: isLoadingProjects } = useProjects();
+  const deleteProjectMutation = useDeleteProject();
 
   // --- Efectos ---
   useEffect(() => {
@@ -31,25 +36,37 @@ function App() {
   };
 
   const handleNewProject = () => {
-    alert('Funcionalidad de creación de proyectos en construcción (Fase 10)');
+    setIsProjectModalOpen(true);
+  };
+
+  const handleProjectCreated = (id: string) => {
+    setSelectedProjectId(id);
+    setIsProjectModalOpen(false);
   };
 
   const handleDeleteProject = (id: string) => {
-    if (confirm('¿Estás seguro de que deseas eliminar este proyecto y todos sus datos?')) {
-      alert(`Eliminación de proyecto ${id} en construcción (Fase 10)`);
+    if (window.confirm('¿Estás seguro de que deseas eliminar este proyecto y todos sus datos?\nEsta acción es irreversible.')) {
+      deleteProjectMutation.mutate(id, {
+        onSuccess: () => {
+          if (selectedProjectId === id) {
+            setSelectedProjectId(null);
+          }
+        }
+      });
     }
   };
 
   const handleNewActivity = () => {
-    alert('Funcionalidad de creación de actividades en construcción (Fase 10)');
+    // La Dashboard maneja su propia apertura de formulario al recibir el trigger
+    // pero mantenemos esto por si el sidebar lo requiere.
   };
 
   const handleSimulate = () => {
-    alert('Simulación de Monte Carlo en construcción (Fase 12)');
+    alert('Simulación de Monte Carlo en construcción (Fase 13 - BI Estendido)');
   };
 
   const handleExport = () => {
-    alert('Generación de reporte PDF en construcción (Fase 13)');
+    alert('Generación de reporte PDF en construcción (Fase 14 - Reporting)');
   };
 
   // Obtener el nombre del proyecto seleccionado para el Header
@@ -85,6 +102,12 @@ function App() {
           />
         </main>
       </div>
+
+      <ProjectModal 
+        isOpen={isProjectModalOpen} 
+        onClose={() => setIsProjectModalOpen(false)} 
+        onSuccess={handleProjectCreated}
+      />
     </div>
   );
 }

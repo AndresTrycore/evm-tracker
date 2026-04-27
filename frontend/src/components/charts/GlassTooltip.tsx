@@ -50,7 +50,7 @@ export const GlassTooltip: React.FC<GlassTooltipProps> = ({
                 className="w-2 h-2 rounded-full" 
                 style={{ backgroundColor: item.color }} 
               />
-              <span className="text-caption text-text-secondary font-sans capitalize">
+              <span className="text-caption text-text-secondary font-sans">
                 {item.name}
               </span>
             </div>

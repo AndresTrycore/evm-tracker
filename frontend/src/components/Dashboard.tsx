@@ -79,7 +79,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ projectId, onNewActivity }
     <div className="flex-1 p-4 md:p-8 space-y-8 overflow-y-auto custom-scrollbar">
       {/* Sección KPIs (Skeletons o Real) */}
       <section>
-        <ProjectKPIs evm={project?.evm_summary} isLoading={isLoading} />
+        <ProjectKPIs
+          evm={project?.evm_summary}
+          activities={project?.activities}
+          isLoading={isLoading}
+        />
       </section>
 
       {/* Sección Gráficas (Visualizaciones EVM Reales) */}
