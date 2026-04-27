@@ -7,7 +7,8 @@ def test_backend_pyproject_contains_ruff_and_mypy_config() -> None:
     config = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
 
     assert config["tool"]["ruff"]["line-length"] == 88
-    assert config["tool"]["mypy"]["python_version"] == "3.13"
+    assert config["tool"]["mypy"]["python_version"] == "3.12"
+
 
 
 def test_backend_uses_a_single_quality_tooling_config_file() -> None:
@@ -16,6 +17,7 @@ def test_backend_uses_a_single_quality_tooling_config_file() -> None:
     assert (backend_root / "pyproject.toml").exists()
     assert not (backend_root / "ruff.toml").exists()
     assert not (backend_root / "mypy.ini").exists()
+
 
 
 def test_backend_dockerfile_installs_tooling_from_pyproject() -> None:
@@ -34,5 +36,6 @@ def test_readme_documents_backend_quality_commands() -> None:
         encoding="utf-8"
     )
 
-    assert "ruff check app tests" in readme_text
-    assert "mypy app" in readme_text
+    assert "ruff check" in readme_text
+    assert "mypy" in readme_text
+

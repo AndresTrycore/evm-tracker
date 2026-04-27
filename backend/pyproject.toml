@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "evm-tracker-backend"
 version = "0.1.0"
 description = "Backend scaffold for EVM Tracker"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115.0",
   "uvicorn[standard]>=0.30.0",
@@ -17,6 +17,7 @@ dev = [
   "httpx>=0.27.0",
   "mypy>=1.15.0",
   "pytest>=9.0.0",
+  "pytest-cov>=6.0.0",
   "ruff>=0.11.0",
 ]
 
@@ -29,17 +30,71 @@ include = ["app*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=80"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
 
 [tool.ruff]
 line-length = 88
-target-version = "py313"
+target-version = "py312"
 src = ["app", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "S",   # bandit (security)
+    "ANN", # type annotations
+    "PTH", # use pathlib
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "S101",    # Use of assert (allowed in tests)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "ANN"]
+"app/api/**/*.py" = ["ANN401"]  # FastAPI routers use -> Any with response_model
+"app/main.py" = ["RUF001"]  # Unicode math symbols (×, −) in Swagger description
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.mypy]
-python_version = "3.13"
-mypy_path = "app"
-warn_unused_configs = true
+python_version = "3.12"
 strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+explicit_package_bases = true
+exclude = ["^backend/"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true

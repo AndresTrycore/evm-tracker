@@ -3,14 +3,13 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from app.db.base import Base
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Numeric, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.db.base import Base
-
 if TYPE_CHECKING:
-    from backend.app.models.project import Project
+    from app.models.project import Project
 
 
 def _utcnow() -> datetime:

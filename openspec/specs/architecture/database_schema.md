@@ -40,8 +40,8 @@
 ┌─────────────────────────────────┐
 │            projects             │
 ├──────────────┬──────────────────┤
-│ id           │ SERIAL PK        │
-│ name         │ VARCHAR(255) NN  │
+│ id           │ UUID PK          │
+│ name         │ VARCHAR(200) NN  │
 │ description  │ TEXT NULL        │
 │ created_at   │ TIMESTAMPTZ NN   │
 │ updated_at   │ TIMESTAMPTZ NN   │
@@ -53,9 +53,9 @@
 ┌─────────────────────────────────────────┐
 │                activities               │
 ├──────────────────┬──────────────────────┤
-│ id               │ SERIAL PK            │
-│ project_id       │ INTEGER FK NN        │
-│ name             │ VARCHAR(255) NN      │
+│ id               │ UUID PK              │
+│ project_id       │ UUID FK NN           │
+│ name             │ VARCHAR(200) NN      │
 │ budget_at_       │ NUMERIC(15,2) NN     │
 │   completion     │ CHECK >= 0           │
 │ planned_progress │ NUMERIC(5,2) NN      │
@@ -80,8 +80,8 @@ Una actividad pertenece a exactamente un proyecto.
 
 | Columna | Tipo PostgreSQL | Tipo Python | Restricciones |
 |---------|----------------|-------------|---------------|
-| `id` | `SERIAL` | `int` | PK, autoincrement |
-| `name` | `VARCHAR(255)` | `str` | NOT NULL |
+| `id` | `UUID` | `uuid.UUID` | PK, default = `uuid4()` |
+| `name` | `VARCHAR(200)` | `str` | NOT NULL, CHECK `length(trim(name)) > 0` |
 | `description` | `TEXT` | `str \| None` | NULL permitido |
 | `created_at` | `TIMESTAMPTZ` | `datetime` | NOT NULL, default = `now()` UTC |
 | `updated_at` | `TIMESTAMPTZ` | `datetime` | NOT NULL, default = `now()` UTC, onupdate = `now()` UTC |
@@ -96,13 +96,13 @@ Una actividad pertenece a exactamente un proyecto.
 
 | Columna | Tipo PostgreSQL | Tipo Python | Restricciones |
 |---------|----------------|-------------|---------------|
-| `id` | `SERIAL` | `int` | PK, autoincrement |
-| `project_id` | `INTEGER` | `int` | NOT NULL, FK → `projects.id` ON DELETE CASCADE |
-| `name` | `VARCHAR(255)` | `str` | NOT NULL |
-| `budget_at_completion` | `NUMERIC(15,2)` | `float` | NOT NULL, CHECK >= 0 |
-| `planned_progress` | `NUMERIC(5,2)` | `float` | NOT NULL, CHECK >= 0 AND <= 100 |
-| `actual_progress` | `NUMERIC(5,2)` | `float` | NOT NULL, CHECK >= 0 AND <= 100 |
-| `actual_cost` | `NUMERIC(15,2)` | `float` | NOT NULL, CHECK >= 0 |
+| `id` | `UUID` | `uuid.UUID` | PK, default = `uuid4()` |
+| `project_id` | `UUID` | `uuid.UUID` | NOT NULL, FK → `projects.id` ON DELETE CASCADE |
+| `name` | `VARCHAR(200)` | `str` | NOT NULL, CHECK `length(trim(name)) > 0` |
+| `budget_at_completion` | `NUMERIC(15,2)` | `Decimal` | NOT NULL, CHECK >= 0 |
+| `planned_progress` | `NUMERIC(5,2)` | `Decimal` | NOT NULL, CHECK >= 0 AND <= 100 |
+| `actual_progress` | `NUMERIC(5,2)` | `Decimal` | NOT NULL, CHECK >= 0 AND <= 100 |
+| `actual_cost` | `NUMERIC(15,2)` | `Decimal` | NOT NULL, CHECK >= 0 |
 | `created_at` | `TIMESTAMPTZ` | `datetime` | NOT NULL, default = `now()` UTC |
 | `updated_at` | `TIMESTAMPTZ` | `datetime` | NOT NULL, default = `now()` UTC, onupdate = `now()` UTC |
 
@@ -140,21 +140,29 @@ def init_db(engine) -> None:
 ### `models/project.py`
 
 ```python
-from datetime import datetime, timezone
-from sqlalchemy import String, Text, DateTime
+import uuid
+from datetime import UTC, datetime
+from sqlalchemy import CheckConstraint, String, Text, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class Project(Base):
     __tablename__ = "projects"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    __table_args__ = (
+        CheckConstraint("length(trim(name)) > 0", name="ck_project_name_not_empty"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=_utcnow
@@ -180,21 +188,24 @@ sin necesidad de hacer `joinedload` manual en cada consulta.
 ### `models/activity.py`
 
 ```python
-from datetime import datetime, timezone
+import uuid
+from datetime import UTC, datetime
 from decimal import Decimal
-from sqlalchemy import Integer, String, Numeric, DateTime, ForeignKey, CheckConstraint, Index
+from sqlalchemy import String, Numeric, DateTime, ForeignKey, CheckConstraint, Index
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class Activity(Base):
     __tablename__ = "activities"
 
     __table_args__ = (
+        CheckConstraint("length(trim(name)) > 0", name="ck_activity_name_not_empty"),
         CheckConstraint("budget_at_completion >= 0", name="ck_activity_bac_non_negative"),
         CheckConstraint("planned_progress >= 0 AND planned_progress <= 100", name="ck_activity_planned_progress_range"),
         CheckConstraint("actual_progress >= 0 AND actual_progress <= 100", name="ck_activity_actual_progress_range"),
@@ -202,13 +213,15 @@ class Activity(Base):
         Index("ix_activities_project_id", "project_id"),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    project_id: Mapped[int] = mapped_column(
-        Integer,
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False,
     )
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
     budget_at_completion: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=2), nullable=False
     )
@@ -245,10 +258,14 @@ Se documenta en el `README.md` como alternativa a la inicialización automática
 -- Ejecutar con: psql -U evm_user -d evm_db -f scripts/init_db.sql
 -- =============================================================================
 
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- Tabla: projects
 CREATE TABLE IF NOT EXISTS projects (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(200) NOT NULL
+                    CONSTRAINT ck_project_name_not_empty
+                    CHECK (length(trim(name)) > 0),
     description TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -256,10 +273,12 @@ CREATE TABLE IF NOT EXISTS projects (
 
 -- Tabla: activities
 CREATE TABLE IF NOT EXISTS activities (
-    id                    SERIAL PRIMARY KEY,
-    project_id            INTEGER NOT NULL
+    id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_id            UUID NOT NULL
                               REFERENCES projects(id) ON DELETE CASCADE,
-    name                  VARCHAR(255) NOT NULL,
+    name                  VARCHAR(200) NOT NULL
+                              CONSTRAINT ck_activity_name_not_empty
+                              CHECK (length(trim(name)) > 0),
     budget_at_completion  NUMERIC(15, 2) NOT NULL
                               CONSTRAINT ck_activity_bac_non_negative
                               CHECK (budget_at_completion >= 0),
@@ -285,18 +304,66 @@ CREATE INDEX IF NOT EXISTS ix_activities_project_id
 -- (No ejecutar en producción)
 -- =============================================================================
 
-INSERT INTO projects (name, description) VALUES
-    ('Portal web corporativo', 'Rediseño completo del portal público de la empresa'),
-    ('Migración a la nube', 'Migración de infraestructura on-premise a AWS');
+INSERT INTO projects (id, name, description) VALUES
+    (
+        '11111111-1111-1111-1111-111111111111',
+        'Portal web corporativo',
+        'Rediseño completo del portal público de la empresa'
+    ),
+    (
+        '22222222-2222-2222-2222-222222222222',
+        'Migración a la nube',
+        'Migración de infraestructura on-premise a AWS'
+    );
 
 INSERT INTO activities
-    (project_id, name, budget_at_completion, planned_progress, actual_progress, actual_cost)
+    (id, project_id, name, budget_at_completion, planned_progress, actual_progress, actual_cost)
 VALUES
-    (1, 'Diseño de interfaz',         5000.00,  80.00, 90.00, 3500.00),
-    (1, 'Desarrollo módulo login',   10000.00,  50.00, 30.00, 4000.00),
-    (1, 'Integración con CRM',        8000.00,  40.00, 20.00, 2000.00),
-    (2, 'Configuración de VPC',       6000.00, 100.00, 100.00, 5800.00),
-    (2, 'Migración de base de datos', 15000.00,  60.00, 45.00, 9500.00);
+    (
+        '11111111-1111-1111-1111-111111111001',
+        '11111111-1111-1111-1111-111111111111',
+        'Diseño de interfaz',
+        5000.00,
+        80.00,
+        90.00,
+        3500.00
+    ),
+    (
+        '11111111-1111-1111-1111-111111111002',
+        '11111111-1111-1111-1111-111111111111',
+        'Desarrollo módulo login',
+        10000.00,
+        50.00,
+        30.00,
+        4000.00
+    ),
+    (
+        '11111111-1111-1111-1111-111111111003',
+        '11111111-1111-1111-1111-111111111111',
+        'Integración con CRM',
+        8000.00,
+        40.00,
+        20.00,
+        2000.00
+    ),
+    (
+        '11111111-1111-1111-1111-111111111004',
+        '22222222-2222-2222-2222-222222222222',
+        'Configuración de VPC',
+        6000.00,
+        100.00,
+        100.00,
+        5800.00
+    ),
+    (
+        '11111111-1111-1111-1111-111111111005',
+        '22222222-2222-2222-2222-222222222222',
+        'Migración de base de datos',
+        15000.00,
+        60.00,
+        45.00,
+        9500.00
+    );
 ```
 
 **Nota:** Los datos de ejemplo generan escenarios EVM variados intencionalmente:
