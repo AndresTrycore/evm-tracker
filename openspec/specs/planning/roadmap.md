@@ -1,7 +1,8 @@
 # Roadmap & Orden de Implementación
 
-> **Versión:** 2.0.0 | **Última actualización:** 2026-04-26
+> **Versión:** 3.0.0 | **Última actualización:** 2026-04-27
 > **Aplicable a:** EVM Dashboard — Trycore Colombia Technical Challenge
+> **Estado Actual:** Backend [COMPLETADO] | Frontend [POR INICIAR]
 
 Este documento detalla el orden secuencial de desarrollo recomendado para asegurar estabilidad e iteración constante.
 
@@ -28,7 +29,34 @@ Este documento detalla el orden secuencial de desarrollo recomendado para asegur
 2. Configuración e integración de Swagger/OpenAPI con ejemplos definidos.
 3. Tests de integración E2E sobre los endpoints usando `TestClient`.
 
-## Fase 5: Refinamiento y Definition of Done
-1. Verificación final de calidad (linter 100% pasable sin warnings, mypy strict, cobertura pytest > 80%).
-2. Revisión de manejo de excepciones y códigos HTTP (404, 422, 500).
-3. Actualización de documentación de despliegue si aplica.
+## Fase 5: Backend Refinement & DoD [FINALIZADO]
+1. Verificación de calidad y cobertura > 90% finalizada.
+2. Manejo de excepciones y CORS configurado.
+3. El backend está listo para servir al frontend.
+
+---
+
+## Fase 6: Frontend Foundation & Design
+1. Setup de Vite + React + Tailwind + Geist/DM Mono.
+2. Implementación de variables CSS y `ThemeToggle`.
+3. Rama: `feat/frontend-foundation`
+
+## Fase 7: API Client & State Layer
+1. Implementación de Axios, Zod schemas y hooks de TanStack Query.
+2. Rama: `feat/api-state-layer`
+
+## Fase 8: App Shell & Dashboard Layout
+1. Implementación de `Sidebar` y estructura de navegación de proyectos.
+2. Rama: `feat/app-shell-sidebar`
+
+## Fase 9: Core EVM Visualization
+1. Componentes `HealthBadge` y `ActivityTable` (Read-only).
+2. Rama: `feat/core-evm-components`
+
+## Fase 10: CRUD & Interactions
+1. Implementación de `ActivityForm` y mutaciones de escritura.
+2. Rama: `feat/activity-crud-flows`
+
+## Fase 11: Advanced BI & Visualizations
+1. `ProjectKPIs` con Mini-Trends y `EVMVisualizations` (S-Curve, Radar, Donut).
+2. Rama: `feat/evm-visualizations-vips`
