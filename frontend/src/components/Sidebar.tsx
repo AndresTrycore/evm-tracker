@@ -54,8 +54,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Header del Sidebar */}
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white font-bold">
-              E
+            <div className="text-accent">
+              <svg width="44" height="44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="6"/>
+                <path d="M38 42L30 50L38 58" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M62 42L70 50L62 58" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M54 35L46 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
             <h1 className="text-heading font-bold tracking-tight">EVM Tracker</h1>
           </div>

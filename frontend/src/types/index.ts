@@ -11,15 +11,18 @@ export interface EVMIndicators {
   variance_at_completion: number | null;
 }
 
+export type CostStatus = 'bajo presupuesto' | 'en presupuesto' | 'sobre presupuesto' | 'sin datos';
+export type ScheduleStatus = 'adelantado' | 'en cronograma' | 'atrasado' | 'sin datos';
+
 export interface EVMSummary extends EVMIndicators {
-  cost_status: 'bajo presupuesto' | 'en presupuesto' | 'sobre presupuesto' | 'sin datos';
-  schedule_status: 'adelantado' | 'en cronograma' | 'atrasado' | 'sin datos';
+  budget_at_completion: number;
+  cost_status: CostStatus;
+  schedule_status: ScheduleStatus;
 }
 
 // --- Project Interfaces ---
 
 export interface Project {
-  activities: any;
   id: string;
   name: string;
   description: string | null;
@@ -45,12 +48,19 @@ export interface Activity {
   planned_progress: number;
   actual_progress: number;
   actual_cost: number;
+  // Computed fields returned by API
+  planned_value: number;
+  earned_value: number;
+  end_date?: string | null;
   created_at: string;
   updated_at: string;
   evm: EVMIndicators;
 }
 
-export type ActivityCreate = Omit<Activity, 'id' | 'project_id' | 'created_at' | 'updated_at' | 'evm'>;
+/** Alias for Activity — used in components that deal with API responses */
+export type ActivityResponse = Activity;
+
+export type ActivityCreate = Omit<Activity, 'id' | 'project_id' | 'created_at' | 'updated_at' | 'evm' | 'planned_value' | 'earned_value' | 'end_date'>;
 export type ActivityUpdate = Partial<ActivityCreate>;
 
 // --- API Error Interface ---
