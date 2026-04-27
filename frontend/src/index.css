@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Colors Base - Dark (Default) */
+  --bg-base: #0E0F11;
+  --bg-surface: #16181C;
+  --bg-elevated: #1E2126;
+  --border: #2A2D33;
+  --border-subtle: #1E2126;
+  --text-primary: #E8E6E1;
+  --text-secondary: #8A8784;
+  --text-disabled: #4A4846;
+  --accent: #4F7CFF;
+  --accent-subtle: #1A2540;
+  --glass-bg: rgba(22, 24, 28, 0.7);
+  --glass-border: rgba(42, 45, 51, 0.5);
+
+  /* Health EVM */
+  --health-green: #4ADE80;
+  --health-yellow: #FACC15;
+  --health-orange: #FB923C;
+  --health-red: #F87171;
+  --health-gray: #8A8784;
+}
+
+[data-theme="light"],
+.light {
+  /* Colors Base - Light */
+  --bg-base: #F5F5F4;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #EBEBEA;
+  --border: #D6D4D0;
+  --border-subtle: #EBEBEA;
+  --text-primary: #1A1917;
+  --text-secondary: #6B6966;
+  --text-disabled: #B5B3B0;
+  --accent: #2563EB;
+  --accent-subtle: #DBEAFE;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(214, 212, 208, 0.5);
+
+  /* Health EVM */
+  --health-green: #16A34A;
+  --health-yellow: #CA8A04;
+  --health-orange: #EA580C;
+  --health-red: #DC2626;
+  --health-gray: #6B6966;
+}
+
+@layer base {
+  body {
+    @apply bg-background-base text-text-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography DM Mono for numbers */
+  .font-mono {
+    font-family: 'DM Mono', monospace;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-glass-bg border border-glass-border backdrop-blur-md shadow-xl;
+  }
+
+  .card-elevated {
+    @apply bg-background-surface border border-border rounded-xl p-4 md:p-6 transition-transform duration-200 hover:shadow-md;
+  }
+}
