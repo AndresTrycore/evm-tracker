@@ -6,7 +6,7 @@ Herramienta interna para que los líderes de proyecto puedan registrar el avance
 
 | Capa | Tecnología |
 |------|-----------|
-| Backend | Python 3.11 + FastAPI |
+| Backend | Python 3.14 + FastAPI |
 | Base de datos | PostgreSQL 15 |
 | ORM | SQLAlchemy |
 | Frontend | React 18 + Axios |
@@ -146,6 +146,15 @@ docker compose run --rm backend pytest tests/unit/ -v
 
 ```bash
 docker compose run --rm backend pytest tests/integration/ -v
+```
+
+### Calidad del backend
+
+Las herramientas Ruff y MyPy se configuran en [backend/pyproject.toml](backend/pyproject.toml) y se ejecutan dentro del contenedor backend.
+
+```bash
+docker compose run --rm backend ruff check app tests
+docker compose run --rm backend mypy app
 ```
 
 ---
