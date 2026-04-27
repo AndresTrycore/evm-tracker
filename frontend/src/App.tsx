@@ -1,104 +1,90 @@
-import React from 'react';
-import { ThemeToggle } from './components/ThemeToggle';
-import { LayoutDashboard, Folder, Settings, Plus, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sidebar } from './components/Sidebar';
+import { Header } from './components/Header';
+import { Dashboard } from './components/Dashboard';
 import { useProjects } from './hooks/useProjects';
 
+const STORAGE_KEY = 'evm-selected-project';
+
 function App() {
-  const { data: projects, isLoading, isError, error } = useProjects();
+  // --- Estado de la Aplicación ---
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
+    return localStorage.getItem(STORAGE_KEY);
+  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // --- Datos ---
+  const { data: projects = [], isLoading: isLoadingProjects } = useProjects();
+
+  // --- Efectos ---
+  useEffect(() => {
+    if (selectedProjectId) {
+      localStorage.setItem(STORAGE_KEY, selectedProjectId);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [selectedProjectId]);
+
+  // --- Handlers ---
+  const handleSelectProject = (id: string) => {
+    setSelectedProjectId(id);
+  };
+
+  const handleNewProject = () => {
+    alert('Funcionalidad de creación de proyectos en construcción (Fase 10)');
+  };
+
+  const handleDeleteProject = (id: string) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este proyecto y todos sus datos?')) {
+      alert(`Eliminación de proyecto ${id} en construcción (Fase 10)`);
+    }
+  };
+
+  const handleNewActivity = () => {
+    alert('Funcionalidad de creación de actividades en construcción (Fase 10)');
+  };
+
+  const handleSimulate = () => {
+    alert('Simulación de Monte Carlo en construcción (Fase 12)');
+  };
+
+  const handleExport = () => {
+    alert('Generación de reporte PDF en construcción (Fase 13)');
+  };
+
+  // Obtener el nombre del proyecto seleccionado para el Header
+  const currentProjectName = projects.find(p => p.id === selectedProjectId)?.name;
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background-base text-text-primary font-sans transition-colors duration-300">
-      {/* Mini Sidebar Placeholder */}
-      <aside className="w-full md:w-64 bg-background-surface border-b md:border-b-0 md:border-r border-border p-4 flex flex-col gap-6">
-        <div className="flex items-center gap-3 px-2">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white font-bold">
-            E
-          </div>
-          <h1 className="text-heading font-bold">EVM Tracker</h1>
-        </div>
-        
-        <nav className="flex-1 flex flex-col gap-2 overflow-y-auto">
-          <div className="flex items-center gap-3 px-3 py-2 bg-accent-subtle text-accent rounded-md">
-            <LayoutDashboard size={18} />
-            <span className="text-body font-medium">Dashboard</span>
-          </div>
-          
-          <div className="mt-4 mb-2 px-3 text-label text-text-secondary uppercase tracking-wider">
-            Proyectos
-          </div>
+    <div className="flex h-screen bg-background-base text-text-primary overflow-hidden">
+      {/* Sidebar - Gestión de Navegación y Proyectos */}
+      <Sidebar
+        projects={projects}
+        selectedId={selectedProjectId}
+        onSelect={handleSelectProject}
+        onDelete={handleDeleteProject}
+        onNew={handleNewProject}
+        isLoading={isLoadingProjects}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
 
-          {isLoading ? (
-            <div className="flex items-center gap-2 px-3 py-2 text-text-secondary">
-              <Loader2 size={16} className="animate-spin" />
-              <span className="text-caption">Cargando...</span>
-            </div>
-          ) : isError ? (
-            <div className="px-3 py-2 text-health-red text-caption">
-              Error al cargar proyectos
-            </div>
-          ) : projects?.length === 0 ? (
-            <div className="px-3 py-2 text-text-disabled text-caption italic">
-              Sin proyectos
-            </div>
-          ) : (
-            projects?.map((project) => (
-              <div key={project.id} className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-background-elevated rounded-md transition-colors cursor-pointer group">
-                <Folder size={18} className="group-hover:text-accent transition-colors" />
-                <span className="text-body truncate">{project.name}</span>
-              </div>
-            ))
-          )}
-        </nav>
+      {/* Contenido Principal */}
+      <div className="flex-1 flex flex-col min-w-0 relative">
+        <Header
+          projectName={currentProjectName}
+          onMenuClick={() => setIsSidebarOpen(true)}
+          onSimulate={handleSimulate}
+          onExport={handleExport}
+        />
 
-        <div className="pt-4 border-t border-border-subtle flex items-center justify-between">
-          <button className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors">
-            <Settings size={18} />
-            <span className="text-caption">Config</span>
-          </button>
-          <ThemeToggle />
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-6 md:p-10 flex flex-col gap-8">
-        <header className="flex justify-between items-center">
-          <div>
-            <h2 className="text-heading md:text-2xl font-bold">Resumen General</h2>
-            <p className="text-text-secondary text-body">Cimientos del sistema de diseño establecidos.</p>
-          </div>
-          <button className="bg-accent text-white px-4 py-2 rounded-md flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <Plus size={18} />
-            <span>Nuevo Proyecto</span>
-          </button>
-        </header>
-
-        {/* Demo Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card-elevated">
-            <h3 className="text-label text-text-secondary mb-2">SISTEMA DE TOKENS</h3>
-            <p className="text-text-primary text-body">
-              Las variables CSS permiten el cambio de tema instantáneo y el efecto Glassmorphism.
-            </p>
-          </div>
-          
-          <div className="card-elevated">
-            <h3 className="text-label text-text-secondary mb-2">TIPOGRAFÍA</h3>
-            <div className="flex flex-col gap-1">
-              <p className="font-sans text-body">Interfaz: Geist Sans</p>
-              <p className="font-mono text-kpi-sm text-health-green">Números: DM Mono 1.00</p>
-            </div>
-          </div>
-
-          <div className="glass-panel p-6 rounded-xl flex flex-col gap-2">
-            <h3 className="text-label text-accent mb-1 uppercase tracking-wider">UI Elevada</h3>
-            <p className="text-text-primary text-body">
-              Este es un panel con Glassmorphism (blur + transparencia).
-            </p>
-            <div className="mt-2 h-2 w-full bg-background-elevated rounded-full overflow-hidden">
-              <div className="h-full bg-accent w-2/3"></div>
-            </div>
-          </div>
-        </section>
-      </main>
+        <main className="flex-1 overflow-hidden flex flex-col">
+          <Dashboard 
+            projectId={selectedProjectId} 
+            onNewActivity={handleNewActivity}
+          />
+        </main>
+      </div>
     </div>
   );
 }
