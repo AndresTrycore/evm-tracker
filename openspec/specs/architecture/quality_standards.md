@@ -1,11 +1,5 @@
 # Quality Standards
 
-> **Versión:** 1.0.0 | **Última actualización:** 2026-04-26  
-> **Aplicable a:** EVM Dashboard — Trycore Colombia Technical Challenge  
-> **Stack:** Python 3.12 + FastAPI · React 19 · PostgreSQL 17
-
----
-
 ## Tabla de contenidos
 
 1. [Gitflow & Control de Versiones](#1-gitflow--control-de-versiones)
