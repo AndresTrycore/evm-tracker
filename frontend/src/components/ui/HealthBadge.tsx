@@ -31,11 +31,17 @@ export const HealthBadge: React.FC<HealthBadgeProps> = ({
 
   const Icon = isNoData ? Minus : isWarning ? AlertTriangle : CheckCircle2;
 
-  const colorClass = isNoData 
-    ? 'bg-text-disabled/10 text-text-disabled border border-text-disabled/20' 
+  const bgColor = isNoData 
+    ? 'rgba(74, 72, 70, 0.1)' 
     : isWarning 
-      ? 'bg-health-red/10 text-health-red border border-health-red/20' 
-      : 'bg-health-green/10 text-health-green border border-health-green/20';
+      ? 'rgba(248, 113, 113, 0.15)' 
+      : 'rgba(74, 222, 128, 0.15)';
+
+  const colorClass = isNoData 
+    ? 'text-text-disabled' 
+    : isWarning 
+      ? 'text-health-red font-semibold' 
+      : 'text-health-green font-semibold';
 
   const sizeClass = size === 'sm' ? 'text-xs px-2 py-0.5' : 'text-sm px-3 py-1';
   const iconSize = size === 'sm' ? 12 : 14;
@@ -69,7 +75,11 @@ export const HealthBadge: React.FC<HealthBadgeProps> = ({
 
   return (
     <div className="relative inline-flex group cursor-help">
-      <span className={`inline-flex items-center gap-1.5 rounded-full font-medium transition-colors ${colorClass} ${sizeClass}`}>
+      <span 
+        className={`inline-flex items-center gap-1.5 rounded-full font-medium transition-colors ${colorClass} ${sizeClass}`}
+        style={{ backgroundColor: bgColor }}
+      >
+
         <Icon size={iconSize} className="shrink-0" />
         {!compact && <span className="truncate max-w-[120px]">{label}</span>}
       </span>

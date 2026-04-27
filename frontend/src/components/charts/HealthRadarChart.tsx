@@ -39,8 +39,8 @@ export const HealthRadarChart: React.FC<HealthRadarChartProps> = ({
   const data = [
     { subject: 'CPI (Costo)', value: cpi, fullMark: 1.5 },
     { subject: 'SPI (Tiempo)', value: spi, fullMark: 1.5 },
-    { subject: 'Salud Costo', value: normalize(cv), fullMark: 1.5 },
-    { subject: 'Salud Tiempo', value: normalize(sv), fullMark: 1.5 },
+    { subject: 'CV Normalizado', value: normalize(cv), fullMark: 1.5 },
+    { subject: 'SV Normalizado', value: normalize(sv), fullMark: 1.5 },
   ];
 
   const colors = {

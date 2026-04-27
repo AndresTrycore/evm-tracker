@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
-import { ChevronDown, ChevronUp, Play, FileText } from 'lucide-react';
-import { EVMSummary } from '../types';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Activity, EVMSummary } from '../types';
 import { HealthBadge } from './ui/HealthBadge';
 import { SkeletonPulse } from './ui/Skeleton';
 
 interface ProjectKPIsProps {
   evm: EVMSummary | undefined;
+  activities?: Activity[];
   isLoading?: boolean;
 }
 
@@ -14,7 +15,7 @@ interface ProjectKPIsProps {
  * Organismo superior del Dashboard: Project KPIs.
  * Muestra métricas clave con micro-tendencias y panel de diagnóstico expansible.
  */
-export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
+export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, activities, isLoading }) => {
   // Persistencia de panel de diagnóstico en localStorage
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -35,14 +36,10 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
   if (isLoading || !evm) {
     return (
       <div className="space-y-4">
-        <div className="flex justify-between items-center w-full mb-6">
+        <div className="flex items-center w-full mb-6">
           <div className="flex gap-3">
             <SkeletonPulse className="h-7 w-28 rounded-full" />
             <SkeletonPulse className="h-7 w-32 rounded-full" />
-          </div>
-          <div className="flex gap-2">
-            <SkeletonPulse className="h-8 w-24 rounded-md" />
-            <SkeletonPulse className="h-8 w-24 rounded-md" />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -101,6 +98,11 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
     { value: evm.schedule_performance_index },
   ] : [];
 
+  const consolidatedActualCost = (activities ?? []).reduce(
+    (acc, activity) => acc + Math.max(activity.actual_cost, 0),
+    0,
+  );
+
   // Helper para panel detallado
   const DetailRow = ({ label, code, value, isVariance = false }: { label: string, code: string, value: number | null, isVariance?: boolean }) => {
     const color = isVariance && value !== null 
@@ -123,28 +125,21 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
   return (
     <div className="space-y-6">
       {/* Cabecera */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex gap-3 flex-wrap">
-          <HealthBadge 
-            dimension="cost" 
-            status={evm.cost_status} 
-            cpi={evm.cost_performance_index} 
-          />
-          <HealthBadge 
-            dimension="schedule" 
-            status={evm.schedule_status} 
-            spi={evm.schedule_performance_index} 
-          />
-        </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-caption font-medium text-text-secondary hover:text-text-primary hover:bg-background-elevated border border-border rounded-md transition-colors">
-            <Play size={14} /> Simular
-          </button>
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-caption font-medium text-text-secondary hover:text-text-primary hover:bg-background-elevated border border-border rounded-md transition-colors">
-            <FileText size={14} /> Reporte
-          </button>
-        </div>
+      <div className="flex gap-3 flex-wrap relative z-20">
+        <HealthBadge 
+          dimension="cost" 
+          status={evm.cost_status} 
+          cpi={evm.cost_performance_index} 
+          tooltipPosition="bottom"
+        />
+        <HealthBadge 
+          dimension="schedule" 
+          status={evm.schedule_status} 
+          spi={evm.schedule_performance_index} 
+          tooltipPosition="bottom"
+        />
       </div>
+
 
       {/* Widgets Core */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -152,7 +147,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
         <div className="relative overflow-hidden bg-background-surface border border-border rounded-xl p-6 shadow-sm flex flex-col justify-between h-[130px] group">
           <div className="z-10 flex flex-col">
             <span className="text-label text-text-secondary uppercase tracking-wider mb-1">
-              Cost Performance (CPI)
+              Desempeño de Costo (CPI)
             </span>
             <span className={`text-kpi-xl font-mono font-bold ${cpiColor}`}>
               {formatIndex(evm.cost_performance_index)}
@@ -174,7 +169,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
         <div className="relative overflow-hidden bg-background-surface border border-border rounded-xl p-6 shadow-sm flex flex-col justify-between h-[130px] group">
           <div className="z-10 flex flex-col">
             <span className="text-label text-text-secondary uppercase tracking-wider mb-1">
-              Schedule Performance (SPI)
+              Desempeño de Plazo (SPI)
             </span>
             <span className={`text-kpi-xl font-mono font-bold ${spiColor}`}>
               {formatIndex(evm.schedule_performance_index)}
@@ -195,7 +190,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
         {/* EAC Widget */}
         <div className="bg-background-surface border border-border rounded-xl p-6 shadow-sm flex flex-col justify-between h-[130px]">
           <span className="text-label text-text-secondary uppercase tracking-wider mb-1">
-            Estimate at Completion (EAC)
+            Estimación al Finalizar (EAC)
           </span>
           <span className={`text-kpi-lg font-mono font-bold text-text-primary ${String(evm.estimate_at_completion).length > 10 ? 'text-kpi-md' : ''} truncate`} title={formatCurrency(evm.estimate_at_completion)}>
             {formatCurrency(evm.estimate_at_completion)}
@@ -219,7 +214,7 @@ export const ProjectKPIs: React.FC<ProjectKPIsProps> = ({ evm, isLoading }) => {
               {/* Columna Izquierda */}
               <div className="space-y-1 md:border-r border-border-subtle md:pr-8">
                 <DetailRow code="PV" label="Valor Planificado" value={evm.planned_value} />
-                <DetailRow code="AC" label="Costo Real" value={evm.actual_cost} />
+                <DetailRow code="AC" label="Costo Real" value={consolidatedActualCost} />
                 <DetailRow code="SV" label="Variación de Cronograma" value={evm.schedule_variance} isVariance />
               </div>
               {/* Columna Derecha */}

@@ -19,6 +19,7 @@ export interface EVMSummary extends EVMIndicators {
 // --- Project Interfaces ---
 
 export interface Project {
+  activities: any;
   id: string;
   name: string;
   description: string | null;
