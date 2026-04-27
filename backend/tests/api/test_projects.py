@@ -85,3 +85,107 @@ def test_get_project_not_found(client: TestClient) -> None:
     assert response.json()["detail"] == f"Proyecto con id {fake_id} no encontrado"
 
 
+def test_create_project_with_empty_name_returns_422(client: TestClient) -> None:
+    response = client.post("/api/v1/projects", json={"name": ""})
+    assert response.status_code == 422
+
+
+def test_update_activity_recalculates_project_indicators(
+    client: TestClient,
+) -> None:
+    # 1. Create project with activity
+    proj_res = client.post("/api/v1/projects", json={"name": "Recalc Proj"})
+    proj_id = proj_res.json()["id"]
+
+    act_res = client.post(
+        f"/api/v1/projects/{proj_id}/activities",
+        json={
+            "name": "Task",
+            "budget_at_completion": 10000.0,
+            "planned_progress": 50.0,
+            "actual_progress": 30.0,
+            "actual_cost": 4000.0,
+        },
+    )
+    act_id = act_res.json()["id"]
+
+    # 2. Get initial EVM
+    initial = client.get(f"/api/v1/projects/{proj_id}").json()
+    initial_ev = initial["activities"][0]["evm"]["earned_value"]
+    assert initial_ev == 3000.0
+
+    # 3. Update activity progress
+    client.put(
+        f"/api/v1/projects/{proj_id}/activities/{act_id}",
+        json={"actual_progress": 80.0},
+    )
+
+    # 4. Verify EVM recalculated
+    updated = client.get(f"/api/v1/projects/{proj_id}").json()
+    updated_ev = updated["activities"][0]["evm"]["earned_value"]
+    assert updated_ev == 8000.0  # 80% * 10000
+
+
+def test_response_includes_cpi_and_spi_status_interpretation(
+    client: TestClient,
+) -> None:
+    proj_res = client.post("/api/v1/projects", json={"name": "Status Proj"})
+    proj_id = proj_res.json()["id"]
+
+    client.post(
+        f"/api/v1/projects/{proj_id}/activities",
+        json={
+            "name": "Dev",
+            "budget_at_completion": 10000.0,
+            "planned_progress": 50.0,
+            "actual_progress": 30.0,
+            "actual_cost": 4000.0,
+        },
+    )
+
+    response = client.get(f"/api/v1/projects/{proj_id}")
+    summary = response.json()["evm_summary"]
+
+    # Verify both status fields exist and have valid values
+    assert summary["cost_status"] in [
+        "bajo presupuesto",
+        "en presupuesto",
+        "sobre presupuesto",
+        "sin datos",
+    ]
+    assert summary["schedule_status"] in [
+        "adelantado",
+        "en cronograma",
+        "atrasado",
+        "sin datos",
+    ]
+
+
+def test_response_indicators_are_rounded_to_two_decimals(
+    client: TestClient,
+) -> None:
+    proj_res = client.post("/api/v1/projects", json={"name": "Rounding Proj"})
+    proj_id = proj_res.json()["id"]
+
+    # BAC=10000, Plan=50%, Actual=30%, AC=4000
+    # CPI = 3000/4000 = 0.75 (exact)
+    # EAC = 10000/0.75 = 13333.3333... → should be 13333.33 in response
+    client.post(
+        f"/api/v1/projects/{proj_id}/activities",
+        json={
+            "name": "Dev",
+            "budget_at_completion": 10000.0,
+            "planned_progress": 50.0,
+            "actual_progress": 30.0,
+            "actual_cost": 4000.0,
+        },
+    )
+
+    response = client.get(f"/api/v1/projects/{proj_id}")
+    evm = response.json()["activities"][0]["evm"]
+
+    assert evm["estimate_at_completion"] == 13333.33
+    assert evm["variance_at_completion"] == -3333.33
+
+
+
