@@ -3,6 +3,7 @@ import { useProject } from '../hooks/useProject';
 import { SkeletonPulse } from './ui/Skeleton';
 import { EmptyState } from './ui/EmptyState';
 import { LayoutDashboard, AlertCircle, Plus } from 'lucide-react';
+import { EVMVisualizations } from './EVMVisualizations';
 
 interface DashboardProps {
   projectId: string | null;
@@ -77,30 +78,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ projectId, onNewActivity }
         )}
       </section>
 
-      {/* Sección Gráficas (Skeletons o Real) */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {isLoading ? (
-          <>
-            <SkeletonPulse className="h-80 lg:col-span-2" />
-            <SkeletonPulse className="h-80 lg:col-span-1" />
-          </>
-        ) : (
-          <>
-            <div className="h-80 lg:col-span-2 bg-background-elevated rounded-xl border border-border-subtle p-6 shadow-sm">
-              <h3 className="text-body font-semibold mb-4">Curva S (Avance vs Plan)</h3>
-              <div className="w-full h-full flex items-center justify-center text-text-disabled italic">
-                Gráfica en construcción (Fase 9)
-              </div>
-            </div>
-            <div className="h-80 lg:col-span-1 bg-background-elevated rounded-xl border border-border-subtle p-6 shadow-sm">
-              <h3 className="text-body font-semibold mb-4">Estado de Salud</h3>
-              <div className="w-full h-full flex items-center justify-center text-text-disabled italic">
-                Radar Chart (Fase 9)
-              </div>
-            </div>
-          </>
-        )}
-      </section>
+      {/* Sección Gráficas (Visualizaciones EVM Reales) */}
+      {!isLoading && project && (
+        <EVMVisualizations project={project} isLoading={isLoading} />
+      )}
+      
+      {isLoading && (
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <SkeletonPulse className="h-80 lg:col-span-2" />
+          <SkeletonPulse className="h-80 lg:col-span-1" />
+        </section>
+      )}
 
       {/* Sección Tabla (Skeletons o Real) */}
       <section className="space-y-4">
