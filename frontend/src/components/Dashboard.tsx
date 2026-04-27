@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
+
 import { useProject } from '../hooks/useProject';
 import { SkeletonPulse } from './ui/Skeleton';
 import { EmptyState } from './ui/EmptyState';
 import { LayoutDashboard, AlertCircle, Plus } from 'lucide-react';
 import { EVMVisualizations } from './EVMVisualizations';
+import { ActivityTable } from './ActivityTable';
+import { ActivityForm } from './ActivityForm';
+import { useDeleteActivity } from '../hooks/useDeleteActivity';
+import { ActivityResponse } from '../types';
 
 interface DashboardProps {
   projectId: string | null;
@@ -16,6 +21,21 @@ interface DashboardProps {
  */
 export const Dashboard: React.FC<DashboardProps> = ({ projectId, onNewActivity }) => {
   const { data: project, isLoading, isError, error } = useProject(projectId);
+  const deleteMutation = useDeleteActivity(projectId || '');
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<ActivityResponse | null>(null);
+
+  const handleEdit = (activity: ActivityResponse | null) => {
+    setSelectedActivity(activity);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (activity: ActivityResponse) => {
+    if (window.confirm(`¿Estás seguro de que deseas eliminar "${activity.name}"?\nEsta acción no se puede deshacer.`)) {
+      deleteMutation.mutate(activity.id);
+    }
+  };
 
   if (!projectId) {
     return (
@@ -96,7 +116,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ projectId, onNewActivity }
           <h3 className="text-heading font-semibold">Actividades</h3>
           {!isLoading && (
             <button 
-              onClick={onNewActivity}
+              onClick={() => handleEdit(null)}
               className="flex items-center gap-2 px-3 py-1.5 bg-accent text-white rounded-md text-caption hover:bg-accent-hover transition-all"
             >
               <Plus size={14} />
@@ -107,14 +127,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ projectId, onNewActivity }
         
         {isLoading ? (
           <SkeletonPulse className="h-64 w-full" />
-        ) : (
-          <div className="bg-background-elevated rounded-xl border border-border-subtle overflow-hidden shadow-sm">
-             <div className="p-12 text-center text-text-disabled italic">
-                Tabla de actividades real (Fase 11)
-             </div>
-          </div>
-        )}
+        ) : project ? (
+          <ActivityTable 
+            activities={project.activities} 
+            isLoading={isLoading} 
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ) : null}
       </section>
+
+      {/* Modal / Panel de Formulario */}
+      {project && (
+        <ActivityForm
+          projectId={project.id}
+          activity={selectedActivity}
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+        />
+      )}
     </div>
   );
 };
+
